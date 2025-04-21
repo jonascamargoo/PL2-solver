@@ -20,3 +20,15 @@ class SolverView(APIView):
                 'status': 'error',
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# curl -X POST http://localhost:8000/api/solve/ \
+# -H "Content-Type: application/json" \
+# -d '{
+#     "objetivo": "maximizar",
+#     "funcao_objetivo": [2, 3],
+#     "restricoes": [
+#         {"coeficientes": [1, 1], "operador": "<=", "valor": 4},
+#         {"coeficientes": [2, 1], "operador": "<=", "valor": 5}
+#     ]
+# }'
