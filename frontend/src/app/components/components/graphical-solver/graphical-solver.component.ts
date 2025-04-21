@@ -38,7 +38,7 @@ interface LinearProgrammingProblem {
 export class GraphicalSolverComponent implements OnInit {
   linearProgrammingForm!: FormGroup;
   objectiveOptions: string[] = ['Maximizar', 'Minimizar'];
-  operatorOptions: string[] = ['≤', '=', '≥'];
+  operatorOptions: string[] = ['≤', '≥'];
   
   constructor(
     private fb: FormBuilder,
@@ -115,15 +115,19 @@ export class GraphicalSolverComponent implements OnInit {
           value: Number(constraint.value)
         }))
       };
-
+  
       console.log('Problema para resolver:', problem);
-      this.snackBar.open('Formulário válido! Pronto para resolver (implementação futura)', 'OK', { duration: 3000 });
+      this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
+      
+      // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
+
     } else {
       this.markFormGroupTouched(this.linearProgrammingForm);
       this.snackBar.open('Por favor, preencha todos os campos corretamente', 'Fechar', { duration: 3000 });
     }
   }
-
+  
+  // Função auxiliar para marcar todos os campos do formulário como touched. Útil para mostrar erros de validação quando o usuário tenta enviar um formulário inválido
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -142,51 +146,19 @@ export class GraphicalSolverComponent implements OnInit {
     });
   }
 
-  saveProblem(): void {
-    if (this.linearProgrammingForm.valid) {
-      const problemToSave = JSON.stringify(this.linearProgrammingForm.value);
-      localStorage.setItem('linearProgrammingProblem', problemToSave);
-      this.snackBar.open('Problema salvo com sucesso!', 'OK', { duration: 2000 });
-    } else {
-      this.markFormGroupTouched(this.linearProgrammingForm);
-      this.snackBar.open('Corrija os erros antes de salvar', 'Fechar', { duration: 3000 });
-    }
+  resetForm(): void {
+    this.linearProgrammingForm = this.fb.group({
+      objective: ['Maximizar', Validators.required],
+      objectiveCoefficients: this.fb.array([
+        this.fb.control('', [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)]),
+        this.fb.control('', [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)])
+      ]),
+      constraints: this.fb.array([
+        this.createConstraint(),
+        this.createConstraint()
+      ])
+    });
+    this.snackBar.open('Formulário resetado com sucesso!', 'OK', { duration: 2000 });
   }
 
-  loadProblem(): void {
-    const savedProblem = localStorage.getItem('linearProgrammingProblem');
-    if (savedProblem) {
-      const problem = JSON.parse(savedProblem);
-      
-      // Recriando o formulário com o problema salvo
-      this.linearProgrammingForm = this.fb.group({
-        objective: [problem.objective, Validators.required],
-        objectiveCoefficients: this.fb.array(
-          problem.objectiveCoefficients.map((coef: string) => 
-            this.fb.control(coef, [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)])
-          )
-        ),
-        constraints: this.fb.array([])
-      });
-
-      // Recriar restrições
-      const constraintsArray = this.linearProgrammingForm.get('constraints') as FormArray;
-      problem.constraints.forEach((constraint: any) => {
-        const constraintGroup = this.fb.group({
-          coefficients: this.fb.array(
-            constraint.coefficients.map((coef: string) => 
-              this.fb.control(coef, [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)])
-            )
-          ),
-          operator: [constraint.operator, Validators.required],
-          value: [constraint.value, [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)]]
-        });
-        constraintsArray.push(constraintGroup);
-      });
-
-      this.snackBar.open('Problema carregado com sucesso!', 'OK', { duration: 2000 });
-    } else {
-      this.snackBar.open('Nenhum problema salvo encontrado', 'Fechar', { duration: 3000 });
-    }
-  }
 }

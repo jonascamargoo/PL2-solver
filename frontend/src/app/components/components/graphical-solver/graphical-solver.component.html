@@ -43,9 +43,9 @@
             <div [formGroup]="constraint" class="flex items-center">
               <div formArrayName="coefficients" class="flex items-center">
                 <mat-form-field appearance="outline" class="w-24">
-                  <mat-label>Coef. X₁</mat-label>
+                  <!-- <mat-label>Coef. X₁</mat-label> -->
                   <input matInput type="number" [formControl]="getConstraintCoefficients(i).controls[0]">
-                  <mat-error *ngIf="getConstraintCoefficients(i).controls[0].invalid">Valor numérico requerido</mat-error>
+                  <!-- <mat-error *ngIf="getConstraintCoefficients(i).controls[0].invalid">Valor numérico requerido</mat-error> -->
                 </mat-form-field>
                 
                 <span class="mx-2 font-medium">X₁ +</span>
@@ -76,7 +76,7 @@
         </div>
         
         <!-- Botões para adicionar/remover restrições -->
-        <div class="flex justify-end mt-4 gap-2">
+        <div class="flex justify-center mt-4 gap-2">
           <button 
             mat-mini-fab 
             color="warn" 
@@ -111,13 +111,11 @@
         <button mat-raised-button color="primary" type="button" (click)="solveProblem()">
           Resolver
         </button>
-        <button mat-raised-button color="accent" type="button" (click)="saveProblem()">
-          Salvar
-        </button>
-        <button mat-raised-button type="button" (click)="loadProblem()">
-          Carregar
+        <button mat-raised-button color="warn" type="button" (click)="resetForm()">
+          Resetar
         </button>
       </div>
+
     </form>
   </div>
 </div>
