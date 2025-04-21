@@ -91,10 +91,10 @@ export class GraphicalSolverComponent implements OnInit {
   }
 
   removeConstraint(): void {
-    if (this.constraints.length > 1) {
+    if (this.constraints.length > 2) {
       this.constraints.removeAt(this.constraints.length - 1);
     } else {
-      this.snackBar.open('Deve haver pelo menos uma restrição', 'Fechar', { duration: 3000 });
+      this.snackBar.open('Deve haver pelo menos duas restrições', 'Fechar', { duration: 3000 });
     }
   }
 
