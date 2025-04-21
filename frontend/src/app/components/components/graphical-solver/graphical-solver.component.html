@@ -15,10 +15,12 @@
           </mat-select>
         </mat-form-field>
         
+        <!-- Coeficientes da função objetivo -->
         <div class="flex items-center">
+
           <mat-form-field appearance="outline" class="w-24">
             <mat-label>Coeficiente</mat-label>
-            <input matInput type="number" [formControl]="objectiveCoefficients.controls[0]">
+            <input matInput type="text" [formControl]="objectiveCoefficients.controls[0]">
             <mat-error *ngIf="objectiveCoefficients.controls[0].invalid">Valor numérico requerido</mat-error>
           </mat-form-field>
           
@@ -26,10 +28,10 @@
           
           <mat-form-field appearance="outline" class="w-24">
             <mat-label>Coeficiente</mat-label>
-            <input matInput type="number" [formControl]="objectiveCoefficients.controls[1]">
+            <input matInput type="text" [formControl]="objectiveCoefficients.controls[1]">
             <mat-error *ngIf="objectiveCoefficients.controls[1].invalid">Valor numérico requerido</mat-error>
           </mat-form-field>
-          
+
           <span class="mx-2 font-medium">X₂</span>
         </div>
       </div>
@@ -41,19 +43,22 @@
         <div formArrayName="constraints" class="space-y-4">
           <div *ngFor="let constraint of constraints.controls; let i = index" class="flex items-center gap-2">
             <div [formGroup]="constraint" class="flex items-center">
+
+              <!-- Coef das restrições -->
               <div formArrayName="coefficients" class="flex items-center">
+
                 <mat-form-field appearance="outline" class="w-24">
-                  <!-- <mat-label>Coef. X₁</mat-label> -->
-                  <input matInput type="number" [formControl]="getConstraintCoefficients(i).controls[0]">
+                  <mat-label>Coef. X₁</mat-label>
+                  <input matInput type="text" [formControl]="getConstraintCoefficients(i).controls[0]">
                   <!-- <mat-error *ngIf="getConstraintCoefficients(i).controls[0].invalid">Valor numérico requerido</mat-error> -->
                 </mat-form-field>
                 
                 <span class="mx-2 font-medium">X₁ +</span>
-                
+
                 <mat-form-field appearance="outline" class="w-24">
                   <mat-label>Coef. X₂</mat-label>
-                  <input matInput type="number" [formControl]="getConstraintCoefficients(i).controls[1]">
-                  <mat-error *ngIf="getConstraintCoefficients(i).controls[1].invalid">Valor numérico requerido</mat-error>
+                  <input matInput type="text" [formControl]="getConstraintCoefficients(i).controls[1]">
+                  <!-- <mat-error *ngIf="getConstraintCoefficients(i).controls[1].invalid">Valor numérico requerido</mat-error> -->
                 </mat-form-field>
 
                 <span class="mx-2 font-medium">X₂</span>
@@ -65,12 +70,13 @@
                   <mat-option *ngFor="let op of operatorOptions" [value]="op">{{ op }}</mat-option>
                 </mat-select>
               </mat-form-field>
-              
+
               <mat-form-field appearance="outline" class="w-24">
                 <mat-label>Valor</mat-label>
-                <input matInput type="number" formControlName="value">
-                <mat-error *ngIf="constraint.get('value')?.invalid">Valor numérico requerido</mat-error>
+                <input matInput type="text" formControlName="value">
+                <!-- <mat-error *ngIf="constraint.get('value')?.invalid">Valor numérico requerido</mat-error> -->
               </mat-form-field>
+              
             </div>
           </div>
         </div>
