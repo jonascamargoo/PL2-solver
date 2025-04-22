@@ -32,3 +32,6 @@ class SolverView(APIView):
 #         {"coeficientes": [2, 1], "operador": "<=", "valor": 5}
 #     ]
 # }'
+
+
+# eu tenho meu angular funcionando e minha api django também funcionando, agora irei implementar a lógica. o que minha aplicação fará é a implementação do método gráfico de programação linear. portanto, preciso criar uma lógica no django que fará isso e preciso conectar o django com o angular. 
