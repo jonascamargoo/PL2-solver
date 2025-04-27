@@ -8,8 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { GraphicalSolverComponent } from './components/components/graphical-solver/graphical-solver.component';
-import { SimplexSolverComponent } from './components/components/simplex-solver/simplex-solver.component';
+import { SolverComponent } from './components/solver/solver.component';
 
 interface LinearProgrammingProblem {
   objective: string;
@@ -34,8 +33,7 @@ interface LinearProgrammingProblem {
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    GraphicalSolverComponent,
-    SimplexSolverComponent
+    SolverComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
@@ -169,15 +167,15 @@ export class AppComponent implements OnInit{
     }
   }
 
-  solveWithSimplex(): void {
-    if (this.linearProgrammingForm.valid) {
-      this.prepareProblemData();
-      this.showSimplexSolver = true;
-      this.showGraphicalSolver = false;
-    } else {
-      this.handleInvalidForm();
-    }
-  }
+  // solveWithSimplex(): void {
+  //   if (this.linearProgrammingForm.valid) {
+  //     this.prepareProblemData();
+  //     this.showSimplexSolver = true;
+  //     this.showGraphicalSolver = false;
+  //   } else {
+  //     this.handleInvalidForm();
+  //   }
+  // }
 
   private prepareProblemData(): void {
     const formData = this.linearProgrammingForm.value;

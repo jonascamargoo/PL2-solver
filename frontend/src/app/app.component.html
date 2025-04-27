@@ -109,10 +109,10 @@
                     [disabled]="!linearProgrammingForm.valid">
                     <mat-icon>show_chart</mat-icon>Gráfico
                 </button>
-                <button mat-raised-button color="accent" (click)="solveWithSimplex()"
+                <!-- <button mat-raised-button color="accent" (click)="solveWithSimplex()"
                     [disabled]="!linearProgrammingForm.valid">
                     <mat-icon>functions</mat-icon>Simplex
-                </button>
+                </button> -->
                 <button mat-raised-button color="warn" (click)="resetForm()">
                     <mat-icon>refresh</mat-icon> Reset
                 </button>
@@ -126,6 +126,19 @@
                 <app-simplex-solver *ngIf="showSimplexSolver" [problemData]="problemData">
                 </app-simplex-solver>
             </div> -->
+
+             <!-- Área de resultados - renderiza condicionalmente cada componente -->
+            <div *ngIf="problemData" class="mt-8">
+                <!-- Renderizar SolverComponent para gráfico -->
+                <div *ngIf="showGraphicalSolver && problemData">
+                    <app-solver [problem]="problemData"></app-solver>
+                </div>
+
+                <!-- (Futuro) Renderizar SimplexSolver -->
+                <!-- <div *ngIf="showSimplexSolver && problemData">
+                    <app-simplex-solver [problem]="problemData"></app-simplex-solver>
+                </div> -->
+            </div>           
 
         </form>
     </div>
