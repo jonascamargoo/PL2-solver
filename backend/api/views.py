@@ -73,3 +73,17 @@ class SolverView(APIView):
         self._add_constraints(problem, variables, constraints)
         result = self._solve_and_collect(problem, variables)
         return result
+
+# req de exemplo
+# curl -X POST http://127.0.0.1:8000/api/solve/ \
+# -H "Content-Type: application/json" \
+# -d '{
+#   "objective": "max",
+#   "objective_func": [3000, 5000],
+#   "constraints": [
+#     {"coefficients": [1,0],"operator": "<=","valor":4},
+#     {"coefficients": [0,2],"operator": ">=","valor":12},
+#     {"coefficients": [3,2],"operator": "<=","valor":18}
+#   ]
+# }'
+
