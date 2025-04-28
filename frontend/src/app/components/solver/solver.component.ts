@@ -1,11 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Input } from '@angular/core';
 import { SolverService } from '../../services/solver.service';
 import { PlotlyModule } from 'angular-plotly.js';
-import * as PlotlyJS from 'plotly.js-dist-min';
-import { CommonModule } from '@angular/common'; // necessário no standalone
-
-PlotlyModule.plotlyjs = PlotlyJS;
+import { isPlatformBrowser, CommonModule } from '@angular/common'; // necessário no standalone
 
 @Component({
   selector: 'app-solver',
@@ -19,11 +16,21 @@ export class SolverComponent {
   @Input() problem!: any;
 
   public graph: any = null;
+  private isBrowser: boolean = false;
 
-  constructor(private solverService: SolverService) {}
+  constructor(
+    private solverService: SolverService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
-  ngOnInit(): void {
-    this.onSolve(); // <- chama ao carregar
+  async ngOnInit(): Promise<void> {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
+    if (this.isBrowser) {
+      const PlotlyJS = await import('plotly.js-dist-min');
+      PlotlyModule.plotlyjs = PlotlyJS;
+      this.onSolve(); // <- chama ao carregar, mas só depois do Plotly carregar
+    }
   }
 
   onSolve(): void {
