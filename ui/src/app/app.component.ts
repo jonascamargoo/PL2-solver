@@ -8,7 +8,8 @@ import { SolverComponent } from './components/solver/solver.component';
     RouterOutlet,
     SolverComponent
   ],
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'ui';
