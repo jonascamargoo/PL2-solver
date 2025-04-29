@@ -132,7 +132,7 @@
 
             <div *ngIf="!isLoading && mathematicalSolution" class="mt-6 p-4 border rounded shadow-sm bg-gray-50">
                 <h2 class="text-xl font-semibold mb-3">Solução Matemática</h2>
-                <p class="mb-2"><strong>Status:</strong>
+                <p class="mb-2"><strong>Status: </strong>
                     <span [ngClass]="{
                     'text-green-600': mathematicalSolution.status === 'Optimal',
                     'text-red-600': mathematicalSolution.status === 'Infeasible' || mathematicalSolution.status === 'Error' || mathematicalSolution.status === 'Erro na comunicação',
@@ -143,13 +143,13 @@
                 </p>
 
                 <p *ngIf="mathematicalSolution.status === 'Optimal'" class="mb-2">
-                    <strong>Valor ótimo:</strong>
+                    <strong>Valor ótimo: </strong>
                     <span class="font-mono">{{ mathematicalSolution.optimal_value | number:'1.2-5' }}</span>
                 </p>
 
                 <div
                     *ngIf="!isLoading && mathematicalSolution && mathematicalSolution.status === 'Optimal' && mathematicalSolution.variables && objectKeys(mathematicalSolution.variables).length > 0">
-                    <h3 class="text-lg font-medium mb-1">Variáveis:</h3>
+                    <h3 class="text-lg font-medium mb-1">Variáveis: </h3>
                     <ul>
                         <li *ngFor="let v of mathematicalSolution.variables | keyvalue" class="ml-4">
                             <strong>{{ v.key }}:</strong> <span class="font-mono">{{ v.value | number:'1.2-5' }}</span>
