@@ -57,12 +57,12 @@ class SolverView(APIView):
         for var in variables:
             var_values[var.name] = var.varValue
 
-        valor_otimo = plp.value(problem.objective)
+        optimal_value = plp.value(problem.objective)
         status = plp.LpStatus[problem.status]
 
         return {
-            "variaveis": var_values,
-            "valor_otimo": valor_otimo,
+            "variables": var_values,
+            "optimal_value": optimal_value,
             "status": status
         }
 

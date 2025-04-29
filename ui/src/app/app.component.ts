@@ -39,6 +39,7 @@ interface LinearProgrammingProblem {
   styleUrls: ['./app.component.css'],
 })
 
+
 export class AppComponent implements OnInit {
   linearProgrammingForm!: FormGroup;
   objectiveOptions: string[] = ['Maximizar', 'Minimizar'];
@@ -150,7 +151,7 @@ export class AppComponent implements OnInit {
       console.log('Problema para resolver:', problem);
       this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
 
-      // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
+      // ...
 
     } else {
       this.markFormGroupTouched(this.linearProgrammingForm);
@@ -176,7 +177,7 @@ export class AppComponent implements OnInit {
       console.log('Problema para resolver:', problem);
       this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
 
-      // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
+      // ...
 
     } else {
       this.markFormGroupTouched(this.linearProgrammingForm);
