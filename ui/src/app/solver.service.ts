@@ -1,36 +1,30 @@
-// src/app/solver.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-// Interface para os dados enviados ao backend (mesma de antes)
 export interface SolverRequest {
   objective: 'max' | 'min';
   objective_func: number[];
   constraints: { coefficients: number[]; operator: string; valor: number }[];
 }
 
-// Interface base da resposta (semelhante à anterior)
 export interface BaseSolverResponse {
   status: string;
-  optimal_value?: number; // Tornar opcional para casos não ótimos
+  optimal_value?: number;
   variables?: { [key: string]: number };
   error?: string;
 }
 
-// Nova interface para a resposta completa de plotagem
 export interface PlotDataResponse extends BaseSolverResponse {
   feasible_region_vertices?: number[][]; // Array de arrays [x, y]
   constraint_lines?: ConstraintLineData[]; // Array de dados das linhas (opcional)
 }
 
-// Interface para dados de linha (opcional)
 export interface ConstraintLineData {
   label: string;
-  x: number[]; // Valores X para a linha
-  y: number[]; // Valores Y para a linha
-  // Pode adicionar mais propriedades como 'color', 'linestyle' se o backend definir
+  x: number[];
+  y: number[];
 }
 
 
@@ -38,7 +32,6 @@ export interface ConstraintLineData {
   providedIn: 'root'
 })
 export class SolverService {
-  // Adapte as URLs conforme necessário
   private solveUrl = 'http://127.0.0.1:8000/api/solve/';
   private solveAndPlotUrl = 'http://127.0.0.1:8000/api/solve_and_plot/'; // NOVO ENDPOINT (exemplo)
 

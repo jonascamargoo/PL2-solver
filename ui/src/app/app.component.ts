@@ -5,16 +5,16 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // Importe o Spinner
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import {
   SolverService,
   SolverRequest,
-  BaseSolverResponse, // Renomeado ou usar como base
-  PlotDataResponse,  // Nova interface importada
-  ConstraintLineData // Nova interface importada
-} from './services/solver.service';
+  BaseSolverResponse,
+  PlotDataResponse,
+  ConstraintLineData
+} from './solver.service';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import Plotly from 'plotly.js-dist-min';
@@ -32,19 +32,19 @@ import { Data, Layout } from 'plotly.js-dist-min';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule // Adicione o módulo do Spinner
+    MatProgressSpinnerModule
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  @ViewChild('plotlyGraph') plotlyGraph!: ElementRef; // Referência para a div do gráfico
+  @ViewChild('plotlyGraph') plotlyGraph!: ElementRef;
 
   linearProgrammingForm!: FormGroup;
   objectiveOptions: string[] = ['Maximizar', 'Minimizar'];
   operatorOptions: string[] = ['≤', '≥'];
   isLoading = false; // Estado de carregamento
-  mathematicalSolution: BaseSolverResponse | null = null; // Armazena a solução matemática
+  mathematicalSolution: BaseSolverResponse | null = null;
   graphRendered = false; // Indica se um gráfico foi renderizado
   // Guarda a resposta completa para o gráfico
   plotData: PlotDataResponse | null = null;
@@ -119,14 +119,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   removeConstraint(): void {
-    if (this.constraints.length > 1) { // Permitir remover até ficar com 1 restrição
+    if (this.constraints.length > 2) { 
       this.constraints.removeAt(this.constraints.length - 1);
     } else {
-      this.snackBar.open('Deve haver pelo menos uma restrição', 'Fechar', { duration: 3000 });
+      this.snackBar.open('Deve haver pelo menos duas restrições', 'Fechar', { duration: 3000 });
     }
   }
 
-  // Função auxiliar para preparar os dados para o backend
   private prepareRequestData(): SolverRequest | null {
     if (!this.linearProgrammingForm.valid) {
       this.markFormGroupTouched(this.linearProgrammingForm);
@@ -134,19 +133,17 @@ export class AppComponent implements OnInit, OnDestroy {
       return null;
     }
 
-    const formData = this.linearProgrammingForm.getRawValue(); // getRawValue inclui campos desabilitados se houver
-
+    const formData = this.linearProgrammingForm.getRawValue(); 
     const requestData: SolverRequest = {
       objective: formData.objective === 'Maximizar' ? 'max' : 'min',
       objective_func: formData.objectiveCoefficients.map(Number),
       constraints: formData.constraints.map((constraint: any) => ({
         coefficients: constraint.coefficients.map(Number),
         operator: constraint.operator === '≤' ? '<=' : '>=',
-        valor: Number(constraint.value) // Backend espera 'valor'
+        valor: Number(constraint.value)
       })),
     };
 
-    // Validação adicional (opcional): verificar se há pelo menos uma restrição
     if (!requestData.constraints || requestData.constraints.length === 0) {
       this.snackBar.open('Adicione pelo menos uma restrição.', 'Fechar', { duration: 3000 });
       return null;
@@ -160,11 +157,11 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!requestData) return;
 
     this.isLoading = true;
-    this.mathematicalSolution = null; // Limpa solução matemática
-    this.plotData = null; // Limpa dados de plotagem anteriores
+    this.mathematicalSolution = null; 
+    this.plotData = null; 
     this.clearGraph();
 
-    this.solverService.solveAndGetPlotData(requestData) // Chama o novo método
+    this.solverService.solveAndGetPlotData(requestData) 
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading = false)
@@ -172,24 +169,22 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           console.log('Resposta do Backend (Gráfico):', response);
-          this.plotData = response; // Armazena a resposta completa
+          this.plotData = response; 
 
           if (response.status === 'Optimal' && response.feasible_region_vertices && response.variables) {
-            this.plotFeasibleRegion(response); // Chama a função de plotagem
+            this.plotFeasibleRegion(response); 
             this.snackBar.open(`Solução ótima encontrada! Gráfico plotado. Valor: ${response.optimal_value}`, 'OK', { duration: 4000 });
           } else {
-            // Lida com outros status (Infeasible, Unbounded, Error)
             this.handleNonOptimalResponse(response); // Reutiliza o handler
-            // Poderia tentar plotar só as linhas de restrição se disponíveis
             if (response.constraint_lines && response.constraint_lines.length > 0) {
               console.log("Tentando plotar apenas as linhas de restrição para status não ótimo.");
               this.plotConstraintLinesOnly(response.constraint_lines);
             }
           }
         },
-        error: (err: BaseSolverResponse) => { // Erro tratado pelo service agora retorna BaseSolverResponse
+        error: (err: BaseSolverResponse) => {
           console.error('Erro ao chamar o serviço (Gráfico):', err);
-          this.handleNonOptimalResponse(err); // Mostra o erro usando o mesmo handler
+          this.handleNonOptimalResponse(err); 
           this.clearGraph();
         }
       });
@@ -201,10 +196,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.mathematicalSolution = null;
-    this.plotData = null; // Limpa dados de plotagem
+    this.plotData = null;
     this.clearGraph();
 
-    this.solverService.solve(requestData) // Chama o método original
+    this.solverService.solve(requestData) 
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading = false)
@@ -212,7 +207,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           console.log('Resposta do Backend (Matemático):', response);
-          this.mathematicalSolution = response; // Armazena para exibição
+          this.mathematicalSolution = response; 
           if (response.status === 'Optimal') {
             this.snackBar.open(`Solução ótima encontrada! Valor: ${response.optimal_value}`, 'OK', { duration: 4000 });
           } else {
@@ -221,13 +216,12 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         error: (err: BaseSolverResponse) => {
           console.error('Erro ao chamar o serviço (Matemático):', err);
-          this.mathematicalSolution = err; // Mostra o erro na área matemática
-          this.handleNonOptimalResponse(err); // Mostra snackbar
+          this.mathematicalSolution = err; 
+          this.handleNonOptimalResponse(err); 
         }
       });
   }
 
-  // NOVA função para plotar a região factível, ponto ótimo e linhas
   private plotFeasibleRegion(data: PlotDataResponse): void {
     if (!this.plotlyGraph?.nativeElement || !data.feasible_region_vertices || !data.variables) {
       console.error("Dados insuficientes ou elemento do gráfico não encontrado para plotar região.");
@@ -236,25 +230,21 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     const plotTraces: Partial<Data>[] = [];
-
-    // 1. Trace para a Região Factível (Polígono)
     const regionVertices = data.feasible_region_vertices;
-    // Adiciona o primeiro ponto ao final para fechar o polígono no Plotly
     if (regionVertices.length > 1) {
       regionVertices.push([...regionVertices[0]]);
     }
     plotTraces.push({
-      x: regionVertices.map(p => p[0]), // Array de X
-      y: regionVertices.map(p => p[1]), // Array de Y
+      x: regionVertices.map(p => p[0]),
+      y: regionVertices.map(p => p[1]),
       fill: 'toself',
-      fillcolor: 'rgba(0, 176, 246, 0.3)', // Cor de preenchimento (ex: azul claro)
-      line: { color: 'rgba(0, 176, 246, 0.8)' }, // Cor da linha de contorno
+      fillcolor: 'rgba(0, 176, 246, 0.3)',
+      line: { color: 'rgba(0, 176, 246, 0.8)' },
       type: 'scatter',
-      mode: 'lines', // 'lines' para formar o polígono
+      mode: 'lines',
       name: 'Região Factível'
     });
 
-    // 2. Trace para as Linhas de Restrição (Opcional, se vierem do backend)
     if (data.constraint_lines && data.constraint_lines.length > 0) {
       data.constraint_lines.forEach(line => {
         plotTraces.push({
@@ -263,13 +253,10 @@ export class AppComponent implements OnInit, OnDestroy {
           mode: 'lines',
           type: 'scatter',
           name: line.label,
-          line: { dash: 'dash', width: 1.5 } // Estilo tracejado
-          // Poderia adicionar cor aqui se viesse do backend: line: { color: line.color }
+          line: { dash: 'dash', width: 1.5 }
         });
       });
     } else {
-      // Alternativa: Se o backend não mandar as linhas, você teria que calculá-las aqui
-      // baseado no this.linearProgrammingForm.value.constraints - MAIS COMPLEXO
       console.warn("Dados das linhas de restrição não fornecidos pelo backend.");
     }
 
@@ -286,17 +273,12 @@ export class AppComponent implements OnInit, OnDestroy {
       marker: { color: 'red', size: 12, symbol: 'star' }
     });
 
-
-    // Calcular limites dinâmicos para os eixos (melhora a visualização)
     let all_x = regionVertices.map(p => p[0]);
     let all_y = regionVertices.map(p => p[1]);
-    // Incluir ponto ótimo nos cálculos de limite
     all_x.push(optimal_x1);
     all_y.push(optimal_x2);
-    // Incluir origem
     all_x.push(0);
     all_y.push(0);
-    // Adicionar pontos das linhas se existirem para limites mais abrangentes
     if (data.constraint_lines) {
       data.constraint_lines.forEach(l => { all_x.push(...l.x); all_y.push(...l.y); });
     }
@@ -306,7 +288,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const maxX = Math.max(...all_x);
     const minY = Math.min(...all_y);
     const maxY = Math.max(...all_y);
-    const paddingX = (maxX - minX) * 0.1 + 1; // Adiciona padding + 1 unidade mínima
+    const paddingX = (maxX - minX) * 0.1 + 1;
     const paddingY = (maxY - minY) * 0.1 + 1;
 
 
@@ -315,8 +297,8 @@ export class AppComponent implements OnInit, OnDestroy {
       xaxis: { title: 'X₁', range: [minX - paddingX, maxX + paddingX] },
       yaxis: { title: 'X₂', range: [minY - paddingY, maxY + paddingY] },
       showlegend: true,
-      legend: { x: 1.05, y: 1 }, // Posiciona legenda fora da área principal
-      hovermode: 'closest' // Melhora a interatividade ao passar o mouse
+      legend: { x: 1.05, y: 1 },
+      hovermode: 'closest'
     };
 
     Plotly.newPlot(this.plotlyGraph.nativeElement, plotTraces, layout, { responsive: true })
@@ -330,7 +312,6 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Função para plotar apenas as linhas (caso não ótimo, mas com dados de linha)
   private plotConstraintLinesOnly(lines: ConstraintLineData[]): void {
     if (!this.plotlyGraph?.nativeElement) return;
 
@@ -369,7 +350,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     Plotly.newPlot(this.plotlyGraph.nativeElement, plotTraces, layout, { responsive: true })
       .then(() => {
-        this.graphRendered = true; // Indica que *algo* foi renderizado
+        this.graphRendered = true;
         console.log("Gráfico Plotly (Apenas Linhas) renderizado.");
       })
       .catch(err => {
@@ -377,14 +358,12 @@ export class AppComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Limpa o gráfico Plotly da div
   private clearGraph(): void {
     if (this.graphRendered && this.plotlyGraph && this.plotlyGraph.nativeElement) {
       Plotly.purge(this.plotlyGraph.nativeElement);
       this.graphRendered = false;
       console.log("Gráfico limpo.");
     }
-    // Garante que a div esteja vazia mesmo que Plotly.purge falhe ou não seja chamado
     if (this.plotlyGraph && this.plotlyGraph.nativeElement) {
       this.plotlyGraph.nativeElement.innerHTML = '';
     }
@@ -392,20 +371,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private handleNonOptimalResponse(response: BaseSolverResponse): void {
     let message = `Status: ${response.status}.`;
-    // Usa a mensagem de erro específica se existir
     if (response.error) {
-      message = response.error; // Usa a mensagem de erro vinda do service/backend
+      message = response.error;
     } else {
-      // Fallback para mensagens genéricas baseadas no status
       message = this.getNonOptimalMessage(response.status);
     }
     this.snackBar.open(message, 'Fechar', { duration: 5000 });
   }
 
   public getNonOptimalMessage(status: string | undefined | null): string {
-    // ... (lógica existente) ...
     if (!status) return '';
-
     switch (status) {
       case 'Infeasible':
         return 'O problema não possui solução que satisfaça todas as restrições.';
@@ -414,18 +389,16 @@ export class AppComponent implements OnInit, OnDestroy {
       case 'Error':
         return 'Ocorreu um erro durante a resolução no servidor.';
       case 'Erro na comunicação':
-        // Esta mensagem agora é primariamente definida no handleError do serviço
         return 'Falha ao conectar com o servidor de resolução.';
       default:
         return `Status inesperado recebido: ${status}.`;
     }
   }
 
-  // Função auxiliar para marcar todos os campos do formulário como touched
   markFormGroupTouched(formGroup: FormGroup | FormArray) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-      control.updateValueAndValidity(); // Garante que o status de erro seja atualizado
+      control.updateValueAndValidity();
 
       if (control instanceof FormGroup || control instanceof FormArray) {
         this.markFormGroupTouched(control);
@@ -434,10 +407,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   resetForm(): void {
-    this.initForm(); // Reinicia o formulário para o estado inicial
-    this.mathematicalSolution = null; // Limpa a solução matemática
-    this.clearGraph(); // Limpa o gráfico
-    this.isLoading = false; // Garante que o loading pare
+    this.initForm();
+    this.mathematicalSolution = null;
+    this.clearGraph();
+    this.isLoading = false;
     this.snackBar.open('Formulário resetado!', 'OK', { duration: 2000 });
   }
 }

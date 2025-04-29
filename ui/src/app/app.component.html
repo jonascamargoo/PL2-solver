@@ -1,6 +1,6 @@
 <div class="container mx-auto p-6 max-w-4xl">
     <div class="bg-white rounded-lg shadow-md p-6 relative">
-        <h1 class="text-2xl font-bold text-center mb-6">Solucionador de Programação Linear</h1>
+        <h1 class="text-2xl font-bold text-center mb-6">Visual LP Solver</h1>
 
         <div *ngIf="isLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
             <mat-spinner diameter="50"></mat-spinner>
@@ -96,7 +96,7 @@
                         <mat-icon>add</mat-icon> Adicionar Restrição
                     </button>
                     <button mat-stroked-button color="warn" type="button" (click)="removeConstraint()"
-                        aria-label="Remover última restrição" [disabled]="constraints.length <= 1">
+                        aria-label="Remover última restrição" [disabled]="constraints.length <= 2">
                         <mat-icon>remove</mat-icon> Remover Última
                     </button>
                 </div>
