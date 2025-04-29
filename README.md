@@ -5,8 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) Uma aplicação web full-stack para resolver problemas de Programação Linear (PL) com duas variáveis. Permite a entrada de funções objetivo e restrições, calcula a solução ótima e exibe uma visualização gráfica interativa da região factível e do ponto ótimo.
 
 ![Screenshot do formulário](assets/form.png)
-![Screenshot do gráfico gerado](assets/visual.png)
-![Screenshot do do método matemático](assets/math.png)
 
 ## Visão Geral
 
@@ -21,9 +19,13 @@ Este projeto consiste em:
 * Adição/Remoção dinâmica de restrições (mínimo de 2).
 * Validação de entradas no formulário.
 * Resolução numérica exibindo status, valor ótimo e variáveis ótimas.
+
+![Screenshot do do método matemático](assets/math.png)
+
 * Visualização gráfica da região factível e ponto ótimo.
-* Indicador de carregamento durante o processamento.
-* Funcionalidade para resetar o formulário.
+
+![Screenshot do gráfico gerado](assets/visual.png)
+
 
 ## Tecnologias Utilizadas
 
