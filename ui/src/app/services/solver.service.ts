@@ -4,54 +4,79 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-// Interface para os dados enviados ao backend
+// Interface para os dados enviados ao backend (mesma de antes)
 export interface SolverRequest {
-  objective: 'max' | 'min'; // Tipagem mais estrita
+  objective: 'max' | 'min';
   objective_func: number[];
   constraints: { coefficients: number[]; operator: string; valor: number }[];
 }
 
-// Interface para a resposta do backend
-export interface SolverResponse {
-  variables: { [key: string]: number };
-  optimal_value: number;
-  status: string; // Ex: "Optimal", "Infeasible", "Unbounded", "Error"
-  error?: string; // Opcional, caso o backend retorne um erro específico
+// Interface base da resposta (semelhante à anterior)
+export interface BaseSolverResponse {
+  status: string;
+  optimal_value?: number; // Tornar opcional para casos não ótimos
+  variables?: { [key: string]: number };
+  error?: string;
 }
+
+// Nova interface para a resposta completa de plotagem
+export interface PlotDataResponse extends BaseSolverResponse {
+  feasible_region_vertices?: number[][]; // Array de arrays [x, y]
+  constraint_lines?: ConstraintLineData[]; // Array de dados das linhas (opcional)
+}
+
+// Interface para dados de linha (opcional)
+export interface ConstraintLineData {
+  label: string;
+  x: number[]; // Valores X para a linha
+  y: number[]; // Valores Y para a linha
+  // Pode adicionar mais propriedades como 'color', 'linestyle' se o backend definir
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SolverService {
-  private apiUrl = 'http://127.0.0.1:8000/api/solve/';
+  // Adapte as URLs conforme necessário
+  private solveUrl = 'http://127.0.0.1:8000/api/solve/';
+  private solveAndPlotUrl = 'http://127.0.0.1:8000/api/solve_and_plot/'; // NOVO ENDPOINT (exemplo)
 
   constructor(private http: HttpClient) { }
 
-  solve(problemData: SolverRequest): Observable<SolverResponse> {
-    console.log('Enviando para o backend:', problemData); // Log para depuração
-    return this.http.post<SolverResponse>(this.apiUrl, problemData).pipe(
-      catchError(this.handleError) // Adiciona tratamento de erro HTTP
+  // Método existente para solução matemática
+  solve(problemData: SolverRequest): Observable<BaseSolverResponse> {
+    console.log('Enviando para (solve):', problemData);
+    return this.http.post<BaseSolverResponse>(this.solveUrl, problemData).pipe(
+      catchError(this.handleError)
     );
   }
 
-  // Método privado para tratar erros HTTP
+  // NOVO método para obter dados de plotagem
+  solveAndGetPlotData(problemData: SolverRequest): Observable<PlotDataResponse> {
+    console.log('Enviando para (solve_and_plot):', problemData);
+    return this.http.post<PlotDataResponse>(this.solveAndPlotUrl, problemData).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'Ocorreu um erro desconhecido!';
+    let errorMessage = 'Ocorreu um erro desconhecido na comunicação com o servidor!';
     if (error.error instanceof ErrorEvent) {
-      // Erro do lado do cliente ou de rede
-      errorMessage = `Erro: ${error.error.message}`;
+      errorMessage = `Erro de cliente: ${error.error.message}`;
     } else {
-      // O backend retornou um código de falha
-      // O corpo da resposta pode conter pistas sobre o que deu errado
       console.error(
         `Backend retornou código ${error.status}, ` +
         `body era:`, error.error);
       // Tenta pegar a mensagem de erro do backend, se existir
-      errorMessage = `Erro do servidor: ${error.status}. ${error.error?.error || error.message}`;
-      // Se o backend retornar uma estrutura específica de erro, ajuste aqui
-      // Ex: if (error.error && error.error.detail) errorMessage = error.error.detail;
+      const backendError = error.error?.error || error.error?.detail || error.message;
+      errorMessage = `Erro do servidor (${error.status}): ${backendError}`;
     }
     // Retorna um observable com uma mensagem de erro amigável
-    return throwError(() => new Error(errorMessage));
+    // Usando a estrutura esperada pela interface BaseSolverResponse para erro
+    return throwError(() => ({
+        status: 'Erro na comunicação',
+        error: errorMessage
+    } as BaseSolverResponse )); // Retorna um erro estruturado
   }
 }
