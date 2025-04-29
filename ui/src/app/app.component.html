@@ -1,12 +1,14 @@
-<div class="container mx-auto p-6 max-w-3xl">
-    <div class="bg-white rounded-lg shadow-md p-6">
+<div class="container mx-auto p-6 max-w-4xl">
+    <div class="bg-white rounded-lg shadow-md p-6 relative">
         <h1 class="text-2xl font-bold text-center mb-6">Solucionador de Programação Linear</h1>
+
+        <div *ngIf="isLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+            <mat-spinner diameter="50"></mat-spinner>
+        </div>
 
         <form [formGroup]="linearProgrammingForm" class="space-y-6">
 
-            <!-- Objetivo -->
-            <div class="flex items-center gap-4">
-                <mat-form-field appearance="outline" class="w-48">
+            <div class="flex flex-wrap items-center gap-4"> <mat-form-field appearance="outline" class="w-48">
                     <mat-label>Objetivo</mat-label>
                     <mat-select formControlName="objective">
                         <mat-option *ngFor="let option of objectiveOptions" [value]="option">
@@ -15,123 +17,156 @@
                     </mat-select>
                 </mat-form-field>
 
-                <!-- Coeficientes da função objetivo -->
-                <div class="flex items-center">
-                    <mat-form-field appearance="outline" class="w-24">
-                        <mat-label>Coeficiente</mat-label>
-                        <input matInput type="text" [formControl]="objectiveCoefficients.controls[0]">
-                        <mat-error *ngIf="objectiveCoefficients.controls[0].invalid">Valor numérico
-                            requerido</mat-error>
+                <div class="flex items-center flex-grow"> <mat-form-field appearance="outline" class="w-24">
+                        <mat-label>Coef.</mat-label> <input matInput type="text"
+                            [formControl]="objectiveCoefficients.controls[0]" placeholder="Ex: 3">
+                        <mat-error
+                            *ngIf="objectiveCoefficients.controls[0].touched && objectiveCoefficients.controls[0].invalid">
+                            Valor numérico
+                        </mat-error>
                     </mat-form-field>
 
                     <span class="mx-2 font-medium">X₁ +</span>
 
                     <mat-form-field appearance="outline" class="w-24">
-                        <mat-label>Coeficiente</mat-label>
-                        <input matInput type="text" [formControl]="objectiveCoefficients.controls[1]">
-                        <mat-error *ngIf="objectiveCoefficients.controls[1].invalid">Valor numérico
-                            requerido</mat-error>
+                        <mat-label>Coef.</mat-label> <input matInput type="text"
+                            [formControl]="objectiveCoefficients.controls[1]" placeholder="Ex: 5">
+                        <mat-error
+                            *ngIf="objectiveCoefficients.controls[1].touched && objectiveCoefficients.controls[1].invalid">
+                            Valor numérico
+                        </mat-error>
                     </mat-form-field>
 
                     <span class="mx-2 font-medium">X₂</span>
                 </div>
             </div>
 
-            <!-- Restrições -->
             <div class="border-t pt-4">
-                <h2 class="text-xl font-semibold mb-4">Restrições</h2>
-
+                <h2 class="text-xl font-semibold mb-4">Restrições (Ax ≤ b ou Ax ≥ b)</h2>
                 <div formArrayName="constraints" class="space-y-4">
-                    <div *ngFor="let constraint of constraints.controls; let i = index" class="flex items-center gap-2">
-                        <div [formGroup]="constraint" class="flex items-center">
+                    <div *ngFor="let constraint of constraints.controls; let i = index"
+                        class="flex flex-wrap items-center gap-2 p-2 border rounded">
+                        <div [formGroup]="constraint" class="flex flex-wrap items-center gap-2 flex-grow">
 
-                            <!-- Coef das restrições -->
                             <div formArrayName="coefficients" class="flex items-center">
-
                                 <mat-form-field appearance="outline" class="w-24">
                                     <mat-label>Coef. X₁</mat-label>
-                                    <input matInput type="text"
-                                        [formControl]="getConstraintCoefficients(i).controls[0]">
-                                    <!-- <mat-error *ngIf="getConstraintCoefficients(i).controls[0].invalid">Valor numérico requerido</mat-error> -->
+                                    <input matInput type="text" [formControl]="getConstraintCoefficients(i).controls[0]"
+                                        placeholder="Ex: 1">
+                                    <mat-error
+                                        *ngIf="getConstraintCoefficients(i).controls[0].touched && getConstraintCoefficients(i).controls[0].invalid">
+                                        Valor
+                                    </mat-error>
                                 </mat-form-field>
 
                                 <span class="mx-2 font-medium">X₁ +</span>
 
                                 <mat-form-field appearance="outline" class="w-24">
                                     <mat-label>Coef. X₂</mat-label>
-                                    <input matInput type="text"
-                                        [formControl]="getConstraintCoefficients(i).controls[1]">
-                                    <!-- <mat-error *ngIf="getConstraintCoefficients(i).controls[1].invalid">Valor numérico requerido</mat-error> -->
+                                    <input matInput type="text" [formControl]="getConstraintCoefficients(i).controls[1]"
+                                        placeholder="Ex: 2">
+                                    <mat-error
+                                        *ngIf="getConstraintCoefficients(i).controls[1].touched && getConstraintCoefficients(i).controls[1].invalid">
+                                        Valor
+                                    </mat-error>
                                 </mat-form-field>
-
                                 <span class="mx-2 font-medium">X₂</span>
-
                             </div>
 
                             <mat-form-field appearance="outline" class="w-20">
-                                <mat-select formControlName="operator">
+                                <mat-label>Op.</mat-label> <mat-select formControlName="operator">
                                     <mat-option *ngFor="let op of operatorOptions" [value]="op">{{ op }}</mat-option>
                                 </mat-select>
                             </mat-form-field>
 
                             <mat-form-field appearance="outline" class="w-24">
-                                <mat-label>Valor</mat-label>
-                                <input matInput type="text" formControlName="value">
-                                <!-- <mat-error *ngIf="constraint.get('value')?.invalid">Valor numérico requerido</mat-error> -->
+                                <mat-label>Valor (b)</mat-label> <input matInput type="text" formControlName="value"
+                                    placeholder="Ex: 10">
+                                <mat-error *ngIf="constraint.get('value')?.touched && constraint.get('value')?.invalid">
+                                    Valor
+                                </mat-error>
                             </mat-form-field>
 
                         </div>
                     </div>
                 </div>
 
-                <!-- Botões para adicionar/remover restrições -->
-                <div class="flex justify-center mt-4 gap-2">
-                    <button mat-mini-fab color="warn" type="button" (click)="removeConstraint()"
-                        aria-label="Remover restrição" class="flex items-center justify-center">
-                        <mat-icon>remove</mat-icon>
+                <div class="flex justify-center mt-4 gap-4"> <button mat-stroked-button color="primary" type="button"
+                        (click)="addConstraint()" aria-label="Adicionar restrição">
+                        <mat-icon>add</mat-icon> Adicionar Restrição
                     </button>
-
-                    <button mat-mini-fab color="primary" type="button" (click)="addConstraint()"
-                        aria-label="Adicionar restrição" class="flex items-center justify-center bg-green-600">
-                        <mat-icon>add</mat-icon>
+                    <button mat-stroked-button color="warn" type="button" (click)="removeConstraint()"
+                        aria-label="Remover última restrição" [disabled]="constraints.length <= 1">
+                        <mat-icon>remove</mat-icon> Remover Última
                     </button>
                 </div>
             </div>
 
-            <!-- Não-negatividade -->
-            <div class="text-center font-medium mt-4">
-                X₁, X₂ ≥ 0
+            <div class="text-center text-gray-600 mt-4 text-sm">
+                Assume-se X₁, X₂ ≥ 0 (não-negatividade implícita).
             </div>
 
-            <!-- Botões de ação, os botoes gráfico e matemático devem acionar suas respectivas funções que ainda não estão implementadas, pois a função solveProblem é genérica -->
-            <div class="flex justify-center gap-4 mt-6">
+            <div class="flex justify-center gap-4 mt-6 border-t pt-6">
                 <button mat-raised-button color="primary" (click)="solveGraphically()"
-                    aria-label="Resolver Graficamente">
-                    Gráfico
+                    aria-label="Resolver Graficamente" [disabled]="isLoading || !linearProgrammingForm.valid">
+                    <mat-icon>insights</mat-icon> Gráfico
                 </button>
                 <button mat-raised-button color="accent" (click)="solveMathematically()"
-                    aria-label="Resolver Matematicamente">
-                    Matemático
+                    aria-label="Resolver Matematicamente" [disabled]="isLoading || !linearProgrammingForm.valid">
+                    <mat-icon>functions</mat-icon> Matemático
                 </button>
-                <button mat-raised-button color="warn" type="button" (click)="resetForm()">
-                    Resetar
+                <button mat-stroked-button color="warn" type="button" (click)="resetForm()" [disabled]="isLoading">
+                    <mat-icon>refresh</mat-icon> Resetar
                 </button>
             </div>
-
         </form>
 
+        <div class="mt-8 border-t pt-6">
 
-        <!-- Área de Gráfico -->
-        <!-- <div #plotlyGraph></div> -->
-        <!-- Área de Solução Matemática -->
-        <!-- <div *ngIf="mathematicalSolution" class="solution-card">
-            <h2>Solução Matemática</h2>
-            <p><strong>Status:</strong> {{ mathematicalSolution.status }}</p>
-            <p><strong>Valor ótimo:</strong> {{ mathematicalSolution.valor_otimo }}</p>
-            <div *ngFor="let v of mathematicalSolution.variaveis | keyvalue">
-                <p><strong>{{ v.key }}:</strong> {{ v.value }}</p>
+            <div #plotlyGraph class="min-h-[400px]">
+                <div *ngIf="!isLoading && !graphRendered && !mathematicalSolution"
+                    class="text-center text-gray-500 pt-10">
+                    Clique em "Gráfico" ou "Matemático" para ver a solução.
+                </div>
             </div>
-        </div> -->
 
+            <div *ngIf="!isLoading && mathematicalSolution" class="mt-6 p-4 border rounded shadow-sm bg-gray-50">
+                <h2 class="text-xl font-semibold mb-3">Solução Matemática</h2>
+                <p class="mb-2"><strong>Status:</strong>
+                    <span [ngClass]="{
+                    'text-green-600': mathematicalSolution.status === 'Optimal',
+                    'text-red-600': mathematicalSolution.status === 'Infeasible' || mathematicalSolution.status === 'Error' || mathematicalSolution.status === 'Erro na comunicação',
+                    'text-orange-600': mathematicalSolution.status === 'Unbounded'
+                    }">
+                        {{ mathematicalSolution.status }}
+                    </span>
+                </p>
+
+                <p *ngIf="mathematicalSolution.status === 'Optimal'" class="mb-2">
+                    <strong>Valor ótimo:</strong>
+                    <span class="font-mono">{{ mathematicalSolution.optimal_value | number:'1.2-5' }}</span>
+                </p>
+
+                <div
+                    *ngIf="mathematicalSolution.status === 'Optimal' && objectKeys(mathematicalSolution.variables).length > 0">
+                    <h3 class="text-lg font-medium mb-1">Variáveis:</h3>
+                    <ul>
+                        <li *ngFor="let v of mathematicalSolution.variables | keyvalue" class="ml-4">
+                            <strong>{{ v.key }}:</strong> <span class="font-mono">{{ v.value | number:'1.2-5' }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <p *ngIf="mathematicalSolution.error" class="mt-3 text-red-700">
+                    <strong>Detalhes do Erro:</strong> {{ mathematicalSolution.error }}
+                </p>
+
+                <p *ngIf="mathematicalSolution.status !== 'Optimal' && !mathematicalSolution.error"
+                    class="mt-3 text-gray-700">
+                    {{ getNonOptimalMessage(mathematicalSolution.status) }}
+                </p>
+            </div>
+
+        </div>
     </div>
 </div>
