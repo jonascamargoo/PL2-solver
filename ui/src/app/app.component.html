@@ -103,10 +103,15 @@
                 X₁, X₂ ≥ 0
             </div>
 
-            <!-- Botões de ação -->
+            <!-- Botões de ação, os botoes gráfico e matemático devem acionar suas respectivas funções que ainda não estão implementadas, pois a função solveProblem é genérica -->
             <div class="flex justify-center gap-4 mt-6">
-                <button mat-raised-button color="primary" type="button" (click)="solveProblem()">
-                    Resolver
+                <button mat-raised-button color="primary" (click)="solveGraphically()"
+                    aria-label="Resolver Graficamente">
+                    Gráfico
+                </button>
+                <button mat-raised-button color="accent" (click)="solveMathematically()"
+                    aria-label="Resolver Matematicamente">
+                    Matemático
                 </button>
                 <button mat-raised-button color="warn" type="button" (click)="resetForm()">
                     Resetar
@@ -114,5 +119,20 @@
             </div>
 
         </form>
+
+
+        <!-- Área de Gráfico -->
+        <!-- <div id="graphDiv" style="width: 100%; height: 500px;" *ngIf="graphData"></div> -->
+
+        <!-- Área de Solução Matemática -->
+        <!-- <div *ngIf="mathematicalSolution" class="solution-card">
+            <h2>Solução Matemática</h2>
+            <p><strong>Status:</strong> {{ mathematicalSolution.status }}</p>
+            <p><strong>Valor ótimo:</strong> {{ mathematicalSolution.valor_otimo }}</p>
+            <div *ngFor="let v of mathematicalSolution.variaveis | keyvalue">
+                <p><strong>{{ v.key }}:</strong> {{ v.value }}</p>
+            </div>
+        </div> -->
+
     </div>
 </div>

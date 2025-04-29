@@ -74,7 +74,7 @@ class SolverView(APIView):
         result = self._solve_and_collect(problem, variables)
         return result
 
-# req de exemplo
+# request de exemplo que está funcionando
 # curl -X POST http://127.0.0.1:8000/api/solve/ \
 # -H "Content-Type: application/json" \
 # -d '{

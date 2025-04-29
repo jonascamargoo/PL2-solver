@@ -36,7 +36,7 @@
 
 // }
 
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { SolverService } from '../../services/solver.service';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms'; // Importe ReactiveFormsModule
 import Plotly from 'plotly.js-dist-min';
@@ -55,7 +55,7 @@ interface Graph {
   templateUrl: './solver.component.html',
   styleUrl: './solver.component.css'
 })
-export class SolverComponent implements OnInit, AfterViewInit {
+export class SolverComponent implements AfterViewInit {
   @ViewChild('plotlyGraph') graphDiv!: ElementRef;
   solverForm: FormGroup;
   solution: { variaveis: { [key: string]: number }; valor_otimo: number; status: string; error?: string } | null = null;
@@ -77,10 +77,6 @@ export class SolverComponent implements OnInit, AfterViewInit {
         })
       ])
     });
-  }
-
-  ngOnInit(): void {
-    // Você pode adicionar lógica de inicialização aqui, se necessário
   }
 
   ngAfterViewInit(): void {
@@ -135,7 +131,7 @@ export class SolverComponent implements OnInit, AfterViewInit {
 
   onSubmit() {
     if (this.solverForm.valid) {
-      this.solverService.solveProblem(this.solverForm.value).subscribe(
+      this.solverService.solve(this.solverForm.value).subscribe(
         (response) => {
           this.solution = response;
           this.updatePlot(response);

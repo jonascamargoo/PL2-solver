@@ -40,7 +40,7 @@ interface LinearProgrammingProblem {
 })
 
 export class AppComponent implements OnInit {
-  linearProgrammingForm!: FormGroup; //devo colocar a interface do plotly? ou generalizar para receber os coeficientes no geral, contemplando o método matemático?
+  linearProgrammingForm!: FormGroup;
   objectiveOptions: string[] = ['Maximizar', 'Minimizar'];
   operatorOptions: string[] = ['≤', '≥'];
 
@@ -105,11 +105,11 @@ export class AppComponent implements OnInit {
   getConstraintCoefficients(index: number): FormArray<FormControl> {
     return this.constraints.at(index).get('coefficients') as FormArray<FormControl>;
   }
-  
+
   solveProblem(): void {
     if (this.linearProgrammingForm.valid) {
       const formData = this.linearProgrammingForm.value;
-      
+
       const problem: LinearProgrammingProblem = {
         objective: formData.objective,
         objectiveCoefficients: formData.objectiveCoefficients.map(Number),
@@ -118,12 +118,12 @@ export class AppComponent implements OnInit {
           operator: constraint.operator,
           value: Number(constraint.value)
         })),
-        
+
       };
-  
+
       console.log('Problema para resolver:', problem);
       this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
-      
+
       // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
 
     } else {
@@ -131,6 +131,91 @@ export class AppComponent implements OnInit {
       this.snackBar.open('Por favor, preencha todos os campos corretamente', 'Fechar', { duration: 3000 });
     }
   }
+
+  solveGraphically() {
+    if (this.linearProgrammingForm.valid) {
+      const formData = this.linearProgrammingForm.value;
+
+      const problem: LinearProgrammingProblem = {
+        objective: formData.objective,
+        objectiveCoefficients: formData.objectiveCoefficients.map(Number),
+        constraints: formData.constraints.map((constraint: any) => ({
+          coefficients: constraint.coefficients.map(Number),
+          operator: constraint.operator,
+          value: Number(constraint.value)
+        })),
+
+      };
+
+      console.log('Problema para resolver:', problem);
+      this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
+
+      // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
+
+    } else {
+      this.markFormGroupTouched(this.linearProgrammingForm);
+      this.snackBar.open('Por favor, preencha todos os campos corretamente', 'Fechar', { duration: 3000 });
+    }
+  }
+
+  solveMathematically() {
+    if (this.linearProgrammingForm.valid) {
+      const formData = this.linearProgrammingForm.value;
+
+      const problem: LinearProgrammingProblem = {
+        objective: formData.objective,
+        objectiveCoefficients: formData.objectiveCoefficients.map(Number),
+        constraints: formData.constraints.map((constraint: any) => ({
+          coefficients: constraint.coefficients.map(Number),
+          operator: constraint.operator,
+          value: Number(constraint.value)
+        })),
+
+      };
+
+      console.log('Problema para resolver:', problem);
+      this.snackBar.open('Formulário válido! Problema encaminhado para resolução', 'OK', { duration: 3000 });
+
+      // Aqui eu irei chamar o serviço que implementa o algoritmo de resolução
+
+    } else {
+      this.markFormGroupTouched(this.linearProgrammingForm);
+      this.snackBar.open('Por favor, preencha todos os campos corretamente', 'Fechar', { duration: 3000 });
+    }
+  }
+
+  // private plotGraph() {
+  //   if (this.graphData) {
+  //     const { feasible_region, optimal_point } = this.graphData;
+  //     // Chama o método de renderização do SolverComponent, por exemplo usando um EventEmitter ou diretamente
+  //     const layout = {
+  //       title: 'Solução Gráfica',
+  //       xaxis: { title: 'x1' },
+  //       yaxis: { title: 'x2' }
+  //     };
+  //     const data = [
+  //       {
+  //         x: feasible_region.x,
+  //         y: feasible_region.y,
+  //         fill: 'toself',
+  //         type: 'scatter',
+  //         mode: 'lines',
+  //         name: 'Região Factível'
+  //       },
+  //       {
+  //         x: [optimal_point[0]],
+  //         y: [optimal_point[1]],
+  //         type: 'scatter',
+  //         mode: 'markers',
+  //         marker: { color: 'red', size: 10 },
+  //         name: 'Ponto Ótimo'
+  //       }
+  //     ];
+  //     Plotly.newPlot('graphDiv', data as any, layout);
+  //   }
+  // }
+
+
 
   // Função auxiliar para marcar todos os campos do formulário como touched. Útil para mostrar erros de validação quando o usuário tenta enviar um formulário inválido
   markFormGroupTouched(formGroup: FormGroup) {
@@ -165,5 +250,4 @@ export class AppComponent implements OnInit {
     });
     this.snackBar.open('Formulário resetado com sucesso!', 'OK', { duration: 2000 });
   }
-
 }
