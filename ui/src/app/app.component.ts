@@ -9,6 +9,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import Plotly from 'plotly.js-dist-min';
+import { Data, Layout, Config } from 'plotly.js-dist-min';
+
+interface Graph {
+  data: Partial<Data>[];
+  layout: Partial<Layout>;
+  config?: Partial<Config>;
+}
 
 interface LinearProgrammingProblem {
   objective: string;

@@ -27,8 +27,5 @@ export class SolverService {
     return this.http.post<SolverResponse>(this.apiUrl, problemData);
   }
 
-  // solve(data: any): Observable<any> {
-  //   return this.http.post('http://127.0.0.1:8000/api/solve/', data);
-  // }
   
 }
