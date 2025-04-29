@@ -1,5 +1,3 @@
-# solver_app/views.py
-
 import pulp as plp
 import numpy as np
 import math
@@ -32,35 +30,30 @@ def is_feasible(point, constraints):
     """Verifica se um ponto satisfaz todas as restrições."""
     x, y = point
     # Verificar não-negatividade primeiro (com tolerância)
-    if x < -TOLERANCE or y < -TOLERANCE:
-        return False
-
-    for const in constraints:
-        coeffs = const['coefficients']
-        op = const['operator']
-        val = const['valor']
+    if x < -TOLERANCE or y < -TOLERANCE: return False
+    
+    for constraint in constraints:
+        coeffs = constraint['coefficients']
+        op = constraint['operator']
+        val = constraint['valor']
         expression_val = coeffs[0] * x + coeffs[1] * y
 
         if op == '<=':
-            if expression_val > val + TOLERANCE:
-                return False
+            if expression_val > val + TOLERANCE: return False
         elif op == '>=':
-            if expression_val < val - TOLERANCE:
-                return False
-        # Adicione '==' se necessário, mas geralmente não é usado em LP padrão
-        # elif op == '==':
-        #     if not np.isclose(expression_val, val, atol=TOLERANCE):
-        #         return False
+            if expression_val < val - TOLERANCE: return False 
+            
     return True
 
-def order_vertices(vertices):
+def order_vertices(vertices: list)  -> list:
     """Ordena os vértices de um polígono convexo em sentido anti-horário."""
-    if not vertices or len(vertices) < 3:
-        return vertices # Não há polígono para ordenar
-
+    
+    # Não há polígono para ordenar
+    if not vertices or len(vertices) < 3: return vertices
+         
     # Calcular o centroide
-    center_x = sum(p[0] for p in vertices) / len(vertices)
-    center_y = sum(p[1] for p in vertices) / len(vertices)
+    center_x = sum(point[0] for point in vertices) / len(vertices)
+    center_y = sum(point[1] for point in vertices) / len(vertices)
 
     # Calcular o ângulo de cada vértice em relação ao centroide
     # Usar math.atan2(y - cy, x - cx)
@@ -76,7 +69,7 @@ def order_vertices(vertices):
     ordered_vertices = [item[0] for item in vertices_with_angles]
     return ordered_vertices
 
-def get_feasible_region_vertices(constraints):
+def get_feasible_region_vertices(constraints: list) -> list:
     """Calcula os vértices ordenados da região factível."""
     lines = []
     # 1. Adicionar linhas das restrições explícitas
@@ -96,27 +89,19 @@ def get_feasible_region_vertices(constraints):
             rounded_point = (round(intersection_point[0], 7), round(intersection_point[1], 7))
             intersections.add(rounded_point)
 
-
     # 4. Filtrar interseções para encontrar vértices factíveis
     feasible_vertices = set() # Usar set para garantir unicidade após verificação
     for point in intersections:
         if is_feasible(point, constraints):
-             # Adicionar ponto factível (arredondado para consistência)
+            # Adicionar ponto factível (arredondado para consistência)
             feasible_vertices.add(point)
-
-    # Lidar com casos onde restrições como x1 <= 4 ou x2 >= 6 definem bordas
-    # e seus pontos podem não vir de interseções diretas de *outras* linhas.
-    # Ex: Se x1 <= 4 for uma borda, precisamos dos pontos (4, y_min) e (4, y_max)
-    # que estejam na região. Uma abordagem mais robusta seria usar bibliotecas
-    # como Shapely, mas vamos tentar a abordagem de interseção + verificação.
-    # Se a região for unbounded, esta abordagem pode não capturar tudo corretamente.
 
     # 5. Ordenar os vértices factíveis
     # Converter set para lista antes de ordenar
     ordered_feasible_vertices = order_vertices(list(feasible_vertices))
 
     # Converter para lista de listas para JSON
-    return [list(p) for p in ordered_feasible_vertices]
+    return [list(point) for point in ordered_feasible_vertices]
 
 
 # --- API Views ---
@@ -139,7 +124,6 @@ class SolverBaseView(APIView):
              raise ValueError("Função objetivo deve ser uma lista com 2 coeficientes.")
         if not isinstance(constraints, list):
              raise ValueError("Restrições devem ser uma lista.")
-        # Adicionar mais validações para os coeficientes e operadores das restrições se necessário
 
         return objective, objective_func, constraints
 
@@ -164,12 +148,9 @@ class SolverBaseView(APIView):
                 prob += expr <= val, f"Constraint_{i}"
             elif op == '>=':
                 prob += expr >= val, f"Constraint_{i}"
-            # Adicione '==' se for suportado/necessário
-
-        # Resolver
+                
         prob.solve()
 
-        # Preparar resultados
         result = {
             "status": plp.LpStatus[prob.status]
         }
@@ -177,7 +158,7 @@ class SolverBaseView(APIView):
             result["optimal_value"] = plp.value(prob.objective)
             result["variables"] = {v.name: v.varValue for v in prob.variables()}
         elif result["status"] in ['Infeasible', 'Unbounded']:
-             result["variables"] = {} # Sem variáveis definidas
+             result["variables"] = {}
              result["optimal_value"] = None
 
         return result
@@ -193,10 +174,10 @@ class SolveView(SolverBaseView):
         except ValueError as e:
             return Response({"status": "Error", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            # Log do erro real é importante aqui
             print(f"Erro inesperado no backend (SolveView): {e}")
-            return Response({"status": "Error", "error": "Erro interno no servidor ao resolver."},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"status": "Error", "error": "Erro interno no servidor ao resolver."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SolvePlotView(SolverBaseView):
